@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhd.demo.mapper.RegionMapper">
+
+
+    <resultMap id="all" type="Region">
+        <id property="rid" column="rid"/>
+        <result property="createTime" column="createTime"/>
+        <result property="modifiedTime" column="modifiedTime"/>
+        <result property="regionName" column="regionName"/>
+        <collection property="citys" ofType="com.hhd.demo.entity.Citys"
+                    column="rid" select="selectAll">
+        </collection>
+    </resultMap>
+
+    <resultMap id="citys" type="Citys">
+        <result column="cid" jdbcType="INTEGER" property="cid"/>
+        <result column="cityName" jdbcType="VARCHAR" property="cityName"/>
+        <result column="addr" jdbcType="VARCHAR" property="addr"/>
+        <result column="rid" jdbcType="INTEGER" property="rid"/>
+    </resultMap>
+
+    <select id="select" resultMap="all">
+        select *
+        from region
+        <where>
+            <if test="region != null">
+            <if test="region.regionName !=null and region.regionName!=''">
+                regionName like CONCAT(CONCAT('%', #{region.regionName}), '%')
+            </if>
+            <if test="region.createTime != null and region.createTime!='' and region.modifiedTime!=null and region.modifiedTime != ''">
+                and createTime BETWEEN #{region.createTime} and #{region.modifiedTime}
+            </if>
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAll" resultMap="citys">
+        select *
+        from citys
+        where rid = #{rid};
+    </select>
+
+
+</mapper>
